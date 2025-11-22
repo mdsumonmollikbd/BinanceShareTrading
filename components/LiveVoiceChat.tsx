@@ -8,10 +8,18 @@ import {
   float32ToInt16Pcm, 
   arrayBufferToBase64 
 } from '../utils/audioUtils';
-import { 
-  Phone, PhoneOff, ArrowLeft, Video, 
-  MoreVertical, Paperclip, Camera, Smile, Lock, Send, Trash2, Keyboard
-} from 'lucide-react';
+
+// --- Types for Telegram WebApp ---
+declare global {
+  interface Window {
+    Telegram?: {
+      WebApp: {
+        expand: () => void;
+        ready: () => void;
+      }
+    }
+  }
+}
 
 // --- Assets / Icons ---
 
@@ -53,49 +61,68 @@ const PROFIT_CALCULATOR_TOOL: FunctionDeclaration = {
   }
 };
 
+const PROVIDE_CONTACT_TOOL: FunctionDeclaration = {
+  name: "provide_admin_contact",
+  description: "Trigger this action to display the Admin Telegram ID card on the user's screen. Use this ONLY when the user is verified eligible.",
+  parameters: {
+    type: Type.OBJECT,
+    properties: {
+      reason: {
+        type: Type.STRING,
+        description: "The reason for providing contact (e.g., 'VIP Purchase' or 'Balance Verified')."
+      }
+    },
+    required: ["reason"]
+  }
+};
+
 const WHALES_PUMP_INSTRUCTION = `
 You are a respectful and professional sales representative for "Whales Pump Share Trading".
 CONTEXT: You follow Islamic business etiquette (Adab) strictly.
 
 CRITICAL BEHAVIOR & GREETING:
-1. **Greeting:** You MUST start the conversation (or reply to the first hello) with the Islamic greeting: "Assalamu Alaikum wa Rahmatullah" (Peace be upon you and God's mercy).
-2. **Tone:** Be polite, humble, honest, and transparent.
-3. **Language:** Speak fluently in Bengali and English. You may use phrases like "InshaAllah" (if God wills) when talking about future profits, and "Alhamdulillah" (Praise be to God) when talking about success.
+1. **Greeting:** Start with "Assalamu Alaikum wa Rahmatullah".
+2. **Tone:** Polite, humble, transparent. Use "InshaAllah" and "Alhamdulillah".
+3. **Language:** Fluent in Bengali and English.
+4. **Grammar Rule (Bengali):** Always use correct sentence structure.
+   - CORRECT: "আমি কিভাবে আপনাকে সাহায্য করতে পারি?" (How can I help you?)
+   - INCORRECT: "আপনি কিভাবে আপনার সাহায্য করতে পারি?"
 
-Your Goal: Help customers choose between our two specific trading signal packages based on their requirements and capital.
+YOUR GOAL: Help customers choose a package.
 
-STRICT SCOPE LIMITATION (CRITICAL):
-- You are ONLY allowed to discuss Whales Pump packages, share trading signals, eligibility, and fees.
-- If the user asks about general knowledge, politics, sports, weather, coding, other companies, or anything unrelated to this business, you MUST politely refuse.
-- Standard Refusal Message: "I apologize, but I am specialized only in Whales Pump trading services. I cannot discuss other topics. How may I assist you with our packages?"
-- Do not answer general questions even if you know the answer. Pivot back to the business.
+STRICT RULE FOR CONTACT INFO (@Binance_Share_Trading):
+- **NEVER** provide the admin Telegram ID (@Binance_Share_Trading) casually.
+- **CONDITION 1 (VIP Membership):** Only provide the ID if the user explicitly confirms they want to BUY a specific subscription plan (e.g., "I want to buy the 1 Month plan").
+- **CONDITION 2 (Share Trading/Profit Share):** You MUST ask for a SCREENSHOT proof of their Binance/Futures account balance first.
+   - **IF User sends image:** Analyze the image. Look for "Total Balance", "Equity", or numbers.
+   - **IF Balance >= $5000:** Congratulate them and provide the contact ID: "☎️ DM US For Full Access 🌐 ✉️ @Binance_Share_Trading ❤️"
+   - **IF Balance < $5000 or Unclear:** Politely apologize and say they are not eligible for Share Trading yet, but they can join the VIP Membership. DO NOT give the contact ID.
 
-OPTION 1: Share Trading Signal (Profit-Sharing / Musharakah Model)
-- Concept: This is similar to a partnership where we share the gain.
-- Requirement: Minimum account balance of $5,000.
-- Fee: 50% of total profit. (Example: If profit is $100, user keeps $50, pays us $50).
-- Note: Mention this is great for transparency as we only earn when they earn.
+NEW PRICING & SERVICES:
 
-OPTION 2: VIP Signal (Monthly Service Fee / Ujrah)
-- Concept: A flat fee for service.
-- Requirement: No minimum balance listed, but $200/month fee applies.
-- Service: 3-5 premium signals daily.
-- Fee: $200 USD one-time monthly payment.
-- Benefit: User keeps 100% of their profits.
+🌟 **VIP MEMBERSHIP (High Accuracy Signals)** 🌟
+- 🌐 Daily 7-16 Signals (Futures)
+- ✅ 24/7 VIP Support
+- ✅ Avg Monthly Profit: 3000-12000%
+- ✨ **Pricing:**
+  👑 01 Month Sub: $300
+  👑 03 Month Sub: $600
+  👑 06 Month Sub: $800
+  👑 12 Month Sub: $1000
 
-TOOLS USAGE:
-- If the user asks for a recommendation, politely ask about their available capital.
-- Use "check_eligibility" if they provide their capital.
-- Use "calculate_profit_share" to show transparent calculations.
+🤝 **SHARE TRADING SIGNAL (Profit Sharing)** 🤝
+- Concept: Partnership model (Musharakah).
+- **Requirement:** Minimum $5,000 Capital (PROOF REQUIRED via Screenshot).
+- Fee: 50% of total profit (You keep 50%, we take 50%).
+- Note: Transparent, we only earn when you earn.
 
-RESTRICTIONS:
-- Do NOT guarantee profits (say "potential profit" or "InshaAllah").
-- Do NOT give financial advice outside our signals.
+STRICT SCOPE:
+- Only discuss Whales Pump business. Refuse other topics politely.
 `;
 
 // Common Emojis List
 const EMOJI_LIST = [
-  "😀","😃","😄","😁","😆","😅","😂","🤣","🥲","☺️","😊","😇","🙂","🙃","😉","😌","😍","🥰","😘","😗","😙","😚","😋","😛","😝","😜","🤪","🤨","🧐","🤓","😎","🥸","🤩","🥳","😏","😒","😞","😔","😟","😕","🙁","☹️","😣","😖","😫","😩","🥺","😢","😭","😤","😠","😡","🤬","🤯","😳","🥵","🥶","😱","😨","😰","😥","😓","🤗","🤔","🤭","🤫","🤥","😶","😐","😑","😬","🙄","😯","😦","😧","😮","😲","🥱","😴","🤤","😪","😵","🤐","🥴","🤢","🤮","🤧","😷","🤒","🤕","🤑","🤠","😈","👿","👹","👺","🤡","💩","👻","💀","👽","👾","🤖","🎃","😺","😸","😹","😻","😼","😽","🙀","😿","😾",
+  "😀","😃","😄","😄","😆","😅","😂","🤣","🥲","☺️","😊","😇","🙂","🙃","😉","😌","😍","🥰","😘","😗","😙","😚","😋","😛","😝","😜","🤪","🤨","🧐","🤓","😎","🥸","🤩","🥳","😏","😒","😞","😔","😟","😕","🙁","☹️","😣","😖","😫","😩","🥺","😢","😭","😤","😠","😡","🤬","🤯","😳","🥵","🥶","😱","😨","😰","😥","😓","🤗","🤔","🤭","🤫","🤥","😶","😐","😑","😬","🙄","😯","😦","😧","😮","😲","🥱","😴","🤤","😪","😵","🤐","🥴","🤢","🤮","🤧","😷","🤒","🤕","🤑","🤠","😈","👿","👹","👺","🤡","💩","👻","💀","👽","👾","🤖","🎃","😺","😸","😹","😻","😼","😽","🙀","😿","😾",
   "👋", "🤚", "🖐", "✋", "🖖", "👌", "🤌", "🤏", "✌️", "🤞", "🤟", "🤘", "🤙", "👈", "👉", "👆", "🖕", "👇", "☝️", "👍", "👎", "✊", "👊", "🤛", "🤜", "👏", "🙌", "👐", "🤲", "🤝", "🙏", "💅", "💪", "🧠", "🫀", "👀", "👁️",
   "❤️", "🧡", "💛", "💚", "💙", "💜", "🖤", "🤍", "🤎", "💔", "❤️‍🔥", "💯", "💢", "💥", "💫", "💦", "💨", "🕳", "💣", "💬", "👁️‍🗨️", "🗨️", "🗯️", "💭", "💤",
   "📈", "📉", "📊", "💲", "💰", "💸", "💵", "💶", "💷", "💳", "💎", "⚖️", "🕌", "🕋"
@@ -122,6 +149,9 @@ const LiveVoiceChat: React.FC = () => {
   
   // Emoji Picker State
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+
+  // File Upload State
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Audio Recording State (Voice Note)
   const [isRecording, setIsRecording] = useState(false);
@@ -158,6 +188,14 @@ const LiveVoiceChat: React.FC = () => {
     if (isRecording) setShowEmojiPicker(false);
   }, [isRecording]);
 
+  // Check for Telegram Web App to expand
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.Telegram?.WebApp) {
+      window.Telegram.WebApp.expand();
+      window.Telegram.WebApp.ready();
+    }
+  }, []);
+
   // --- Business Logic Executors ---
   const executeTool = async (name: string, args: any) => {
     console.log(`Executing business logic for: ${name}`, args);
@@ -167,13 +205,13 @@ const LiveVoiceChat: React.FC = () => {
       const { capital } = args;
       if (capital >= 5000) {
         return { 
-          result: "Eligible for BOTH options.",
-          recommendation: "Since you have over $5,000, you can choose Option 1 (Profit Share) which is like a partnership, or Option 2 ($200/month) if you prefer a fixed fee." 
+          result: "Eligible for Share Trading.",
+          recommendation: "With over $5,000, you are eligible for our Share Trading (50/50 split). Please upload a screenshot of your balance for verification." 
         };
       } else {
         return { 
-          result: "Eligible for Option 2 ONLY.",
-          recommendation: `With $${capital}, you do not meet the $5,000 requirement for Option 1. You must choose Option 2 (VIP Signal) for $200/month.` 
+          result: "NOT Eligible for Share Trading.",
+          recommendation: `Your capital ($${capital}) is below the $5,000 requirement for Share Trading. Please join our VIP Membership starting at $300.` 
         };
       }
     }
@@ -188,6 +226,17 @@ const LiveVoiceChat: React.FC = () => {
         userKeeps: userKeep,
         message: `For a profit of $${profit}, you will keep $${userKeep} and pay us $${fee} as service fee.`
       };
+    }
+
+    if (name === 'provide_admin_contact') {
+      const contactMsg = { 
+        id: Date.now(), 
+        text: "🎉 **Congratulations! You are eligible.**\n\n☎️ **DM US For Full Access** 🌐\n✉️ @Binance_Share_Trading ❤️", 
+        sender: 'agent', 
+        time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) 
+      };
+      setTextMessages(prev => [...prev, contactMsg]);
+      return { result: "Contact card successfully displayed on user screen." };
     }
 
     return { error: 'Unknown tool' };
@@ -271,8 +320,38 @@ const LiveVoiceChat: React.FC = () => {
     audioChunksRef.current = [];
   };
 
-  // --- Helper to Send to Gemini (Text or Audio) ---
-  const processMessageToGemini = async (text: string | null, audioBase64: string | null = null, mimeType: string = '') => {
+  // --- File Upload Logic (Screenshot) ---
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Reset input so same file can be selected again
+    event.target.value = '';
+
+    const reader = new FileReader();
+    reader.onloadend = async () => {
+      const base64String = (reader.result as string).split(',')[1];
+      const imageUrl = URL.createObjectURL(file);
+      const mimeType = file.type;
+
+      // Add image to chat UI
+      const newUserMsg = { 
+        id: Date.now(), 
+        imageUrl: imageUrl,
+        sender: 'user', 
+        time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+        status: 'sent'
+      };
+      setTextMessages(prev => [...prev, newUserMsg]);
+
+      // Send to Gemini
+      await processMessageToGemini("Here is my balance screenshot.", base64String, mimeType);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // --- Helper to Send to Gemini (Text or Audio or Image) ---
+  const processMessageToGemini = async (text: string | null, mediaBase64: string | null = null, mimeType: string = '') => {
      const apiKey = process.env.API_KEY;
      if (!apiKey || apiKey === "undefined") {
         const errorMsg = "API Key is missing or invalid. Please check your settings.";
@@ -289,26 +368,24 @@ const LiveVoiceChat: React.FC = () => {
           model: 'gemini-2.5-flash',
           config: {
             systemInstruction: WHALES_PUMP_INSTRUCTION,
-            tools: [{ functionDeclarations: [ELIGIBILITY_TOOL, PROFIT_CALCULATOR_TOOL] }],
+            tools: [{ functionDeclarations: [ELIGIBILITY_TOOL, PROFIT_CALCULATOR_TOOL, PROVIDE_CONTACT_TOOL] }],
           }
         });
       }
 
       let messagePayload: any;
-      if (text) {
-        messagePayload = { message: text };
-      } else if (audioBase64) {
-        // Send audio part
-        messagePayload = { 
-          message: [
-            { 
-              inlineData: { 
-                mimeType: mimeType, 
-                data: audioBase64 
-              } 
-            }
-          ] 
-        };
+
+      if (mediaBase64) {
+         // Handle Media (Image or Audio)
+         const parts: any[] = [
+            { inlineData: { mimeType: mimeType, data: mediaBase64 } }
+         ];
+         if (text) parts.push({ text: text });
+         
+         messagePayload = { message: { parts } };
+      } else if (text) {
+         // Handle Text Only
+         messagePayload = { message: text };
       } else {
         return;
       }
@@ -346,10 +423,8 @@ const LiveVoiceChat: React.FC = () => {
       console.error("Gemini Chat Error:", e);
       let errorMessage = "Sorry, something went wrong.";
       
-      // Handle Network/API Errors
       if (e.message?.includes('Network') || e.message?.includes('fetch')) {
          errorMessage = "Network Error: Please check your internet connection. Retrying might help.";
-         // Reset session on network error to force reconnection logic next time
          chatSessionRef.current = null;
       }
       
@@ -412,6 +487,14 @@ const LiveVoiceChat: React.FC = () => {
     setView('chat');
   }, [stopAudio]);
 
+  const handlePhoneClick = () => {
+    if (connectionState === ConnectionState.CONNECTED || connectionState === ConnectionState.CONNECTING) {
+      setView('call');
+    } else {
+      startSession();
+    }
+  };
+
   const handleSendTextMessage = async () => {
     if (!inputText.trim()) return;
     const userText = inputText.trim();
@@ -468,7 +551,7 @@ const LiveVoiceChat: React.FC = () => {
             voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Aoede' } },
           },
           systemInstruction: WHALES_PUMP_INSTRUCTION,
-          tools: [{ functionDeclarations: [ELIGIBILITY_TOOL, PROFIT_CALCULATOR_TOOL] }],
+          tools: [{ functionDeclarations: [ELIGIBILITY_TOOL, PROFIT_CALCULATOR_TOOL, PROVIDE_CONTACT_TOOL] }],
         },
       };
 
@@ -633,11 +716,26 @@ const LiveVoiceChat: React.FC = () => {
   // -------------------------------------------
   if (view === 'chat') {
     return (
-      <div className="flex flex-col h-full w-full bg-[#0b141a]">
+      <div className="flex flex-col h-full w-full bg-[#0b141a] relative">
+        
+        {/* WhatsApp-style Active Call Return Banner */}
+        {(connectionState === ConnectionState.CONNECTED || connectionState === ConnectionState.CONNECTING) && (
+           <div 
+             onClick={() => setView('call')}
+             className="bg-[#00a884] h-10 flex items-center justify-center gap-2 cursor-pointer z-50 shadow-md w-full"
+           >
+              <span className="text-white text-sm font-medium">Tap to return to call</span>
+              <span className="text-white text-sm font-medium">•</span>
+              <span className="text-white text-sm font-medium">{formatTime(callDuration)}</span>
+           </div>
+        )}
+
         {/* Header */}
         <div className="bg-[#202c33] py-3 px-4 flex items-center justify-between shadow-sm z-10">
           <div className="flex items-center gap-3">
-            <div className="text-[#aebac1] cursor-pointer"><ArrowLeft size={24} /></div>
+            <div className="text-[#aebac1] cursor-pointer">
+              <i className="fa-solid fa-arrow-left text-xl"></i>
+            </div>
             <div className="relative">
               <WhalesPumpLogo className="w-10 h-10 rounded-full" iconSize="text-xl" />
             </div>
@@ -646,10 +744,11 @@ const LiveVoiceChat: React.FC = () => {
               <span className="text-[#8696a0] text-xs">Online</span>
             </div>
           </div>
-          <div className="flex items-center gap-5 text-[#00a884]">
-            <Video size={22} className="cursor-pointer" />
-            <Phone size={22} className="cursor-pointer fill-current" onClick={startSession} />
-            <MoreVertical size={22} className="text-[#8696a0] cursor-pointer" />
+          <div className="flex items-center gap-6 text-[#00a884]">
+            <i className="fa-solid fa-video text-lg cursor-pointer"></i>
+            {/* Logic updated to resume call if active, else start new */}
+            <i className="fa-solid fa-phone text-lg cursor-pointer" onClick={handlePhoneClick}></i>
+            <i className="fa-solid fa-ellipsis-vertical text-[#8696a0] text-lg cursor-pointer"></i>
           </div>
         </div>
 
@@ -666,8 +765,8 @@ const LiveVoiceChat: React.FC = () => {
 
             {/* Encrypted Notice */}
             <div className="flex justify-center mb-6">
-              <div className="bg-[#182229] text-[#ffcc00] text-[10px] py-1.5 px-3 rounded-lg text-center flex items-center gap-1 max-w-xs leading-3">
-                 <Lock size={10} /> Messages and calls are end-to-end encrypted. No one outside of this chat, not even WhatsApp, can read or listen to them.
+              <div className="bg-[#182229] text-[#ffcc00] text-[10px] py-1.5 px-3 rounded-lg text-center flex items-center gap-1.5 max-w-xs leading-3">
+                 <i className="fa-solid fa-lock text-[10px]"></i> Messages and calls are end-to-end encrypted. No one outside of this chat, not even WhatsApp, can read or listen to them.
               </div>
             </div>
 
@@ -687,8 +786,12 @@ const LiveVoiceChat: React.FC = () => {
                       </svg>
                     )}
                     
-                    {/* Content: Text or Audio */}
-                    {msg.audioUrl ? (
+                    {/* Content: Text, Audio or Image */}
+                    {msg.imageUrl ? (
+                       <div className="min-w-[200px] p-1">
+                          <img src={msg.imageUrl} alt="Attachment" className="rounded-lg max-h-[300px] w-full object-cover" />
+                       </div>
+                    ) : msg.audioUrl ? (
                       <div className="flex items-center gap-2 min-w-[200px] py-1">
                          <div className="relative w-8 h-8 rounded-full bg-[#00a884] flex items-center justify-center">
                             <i className="fa-solid fa-microphone text-white text-sm"></i>
@@ -710,7 +813,11 @@ const LiveVoiceChat: React.FC = () => {
 
                     <div className="flex items-center justify-end gap-1 absolute bottom-1 right-1.5">
                        <span className={`${msg.sender === 'user' ? 'text-[#c1e6e1]' : 'text-[#8696a0]'} text-[10px]`}>{msg.time}</span>
-                       {msg.sender === 'user' && <span className="text-[#53bdeb] text-[10px]">✓✓</span>}
+                       {msg.sender === 'user' && (
+                         <span className="text-[#53bdeb] text-[10px]">
+                           <i className="fa-solid fa-check-double"></i>
+                         </span>
+                       )}
                     </div>
                   </div>
                </div>
@@ -734,6 +841,15 @@ const LiveVoiceChat: React.FC = () => {
           </div>
         )}
 
+        {/* Hidden File Input */}
+        <input 
+          type="file" 
+          accept="image/*" 
+          ref={fileInputRef} 
+          className="hidden"
+          onChange={handleFileSelect}
+        />
+
         {/* Input Bar / Recording Bar */}
         {isRecording ? (
            <div className="bg-[#202c33] px-4 py-2 flex items-center gap-4 z-20 h-[62px]">
@@ -741,7 +857,7 @@ const LiveVoiceChat: React.FC = () => {
                 className="text-[#f15c6d] cursor-pointer animate-pulse" 
                 onClick={handleCancelRecording}
               >
-                 <Trash2 size={24} />
+                 <i className="fa-solid fa-trash-can text-xl"></i>
               </div>
               <div className="flex-1 flex items-center gap-2">
                  <div className="w-2 h-2 rounded-full bg-[#f15c6d] animate-pulse"></div>
@@ -754,20 +870,25 @@ const LiveVoiceChat: React.FC = () => {
                  className="p-3 bg-[#00a884] rounded-full text-white shadow-md cursor-pointer active:scale-95 transition-transform flex items-center justify-center"
                  onClick={handleStopAndSendRecording}
               >
-                 <Send size={20} fill="white" className="ml-0.5" />
+                 <i className="fa-solid fa-paper-plane text-lg ml-0.5"></i>
               </div>
            </div>
         ) : (
-          <div className="bg-[#202c33] px-2 py-2 flex items-center gap-2 z-20">
+          <div className="bg-[#202c33] px-2 py-2 flex items-center gap-2 z-20 min-h-[60px]">
+            {/* Emoji Toggle */}
             <div 
-              className="p-2 text-[#8696a0] cursor-pointer" 
-              onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+               className="p-2 text-[#8696a0] cursor-pointer" 
+               onClick={() => setShowEmojiPicker(!showEmojiPicker)}
             >
-              {showEmojiPicker ? <Keyboard size={24} /> : <Smile size={24} />}
+               {showEmojiPicker ? (
+                  <i className="fa-solid fa-keyboard text-2xl"></i>
+               ) : (
+                  <i className="fa-regular fa-face-smile text-2xl"></i>
+               )}
             </div>
-            <div className="p-2 text-[#8696a0] cursor-pointer"><Paperclip size={24} /></div>
             
-            <div className="flex-1 bg-[#2a3942] rounded-lg flex items-center px-3 py-1">
+            {/* Input Pill (Matches WhatsApp Latest) */}
+            <div className="flex-1 bg-[#2a3942] rounded-[24px] flex items-center px-4 py-2 gap-3">
               <input 
                  type="text"
                  value={inputText}
@@ -775,28 +896,39 @@ const LiveVoiceChat: React.FC = () => {
                  onChange={(e) => setInputText(e.target.value)}
                  onKeyDown={(e) => e.key === 'Enter' && handleSendTextMessage()}
                  placeholder="Message"
-                 className="w-full bg-transparent text-[#d1d7db] text-sm py-2 focus:outline-none placeholder-[#8696a0]"
+                 className="w-full bg-transparent text-[#d1d7db] text-sm focus:outline-none placeholder-[#8696a0]"
               />
+              
+              {/* Paperclip Inside */}
+              <div 
+                 className="text-[#8696a0] cursor-pointer"
+                 onClick={() => fileInputRef.current?.click()}
+              >
+                 <i className="fa-solid fa-paperclip text-xl -rotate-45"></i>
+              </div>
+
+              {/* Camera Inside (Only if empty) */}
+              {!inputText.trim() && (
+                <div 
+                   className="text-[#8696a0] cursor-pointer" 
+                   onClick={() => fileInputRef.current?.click()}
+                >
+                   <i className="fa-solid fa-camera text-xl"></i>
+                </div>
+              )}
             </div>
             
-            {inputText.trim() ? (
-              <div 
-                className="p-3 bg-[#00a884] rounded-full text-white shadow-md cursor-pointer active:scale-95 transition-transform flex items-center justify-center"
-                onClick={handleSendTextMessage}
-              >
-                <Send size={20} fill="white" className="ml-0.5" />
-              </div>
-            ) : (
-               <>
-                <div className="p-2 text-[#8696a0] cursor-pointer"><Camera size={24} /></div>
-                <div 
-                  className="p-3 bg-[#00a884] rounded-full text-white shadow-md cursor-pointer active:scale-95 transition-transform flex items-center justify-center"
-                  onClick={handleStartRecording}
-                >
-                  <i className="fa-solid fa-microphone text-lg"></i>
-                </div>
-               </>
-            )}
+            {/* Mic / Send Button (Circle Outside) */}
+            <div 
+                 className="w-12 h-12 bg-[#00a884] rounded-full text-white shadow-md cursor-pointer active:scale-95 transition-transform flex items-center justify-center shrink-0 ml-1"
+                 onClick={inputText.trim() ? handleSendTextMessage : handleStartRecording}
+            >
+                 {inputText.trim() ? (
+                    <i className="fa-solid fa-paper-plane text-lg ml-0.5"></i>
+                 ) : (
+                    <i className="fa-solid fa-microphone text-lg"></i>
+                 )}
+            </div>
           </div>
         )}
       </div>
@@ -811,8 +943,8 @@ const LiveVoiceChat: React.FC = () => {
        
        {/* Top Bar */}
        <div className="pt-6 pb-2 px-4 flex flex-col items-center relative z-20">
-          <div className="flex items-center gap-1 text-[#8696a0] text-[10px] mb-4">
-             <Lock size={10} /> End-to-end encrypted
+          <div className="flex items-center gap-1.5 text-[#8696a0] text-[10px] mb-4">
+             <i className="fa-solid fa-lock text-[10px]"></i> End-to-end encrypted
           </div>
           <h2 className="text-xl font-semibold tracking-wide">Whales Pump Support</h2>
           <p className="text-[#8696a0] text-sm mt-1">
@@ -846,38 +978,48 @@ const LiveVoiceChat: React.FC = () => {
        </div>
 
        {/* Bottom Controls Sheet */}
-       <div className="bg-[#101d25] rounded-t-3xl pt-6 pb-8 px-8 w-full z-20">
-         <div className="flex justify-center mb-2">
-            <div className="w-10 h-1 bg-[#37404a] rounded-full opacity-50 mb-6"></div>
+       <div className="bg-[#101d25] rounded-t-[30px] pt-4 pb-10 px-8 w-full z-20 absolute bottom-0 border-t border-white/5 shadow-2xl">
+         {/* Handle */}
+         <div className="flex justify-center mb-8">
+            <div className="w-10 h-1 bg-[#8696a0] rounded-full opacity-40"></div>
          </div>
          
-         <div className="flex items-center justify-between max-w-xs mx-auto">
-            {/* Speaker (Visual only) */}
-            <button className="p-3 rounded-full hover:bg-[#ffffff10] text-white transition-colors">
-               <div className="w-6 h-6 flex items-center justify-center border border-white rounded-md">
-                  <span className="text-[10px] font-bold">···</span>
-               </div>
+         {/* Controls Grid */}
+         <div className="flex items-center justify-between max-w-[340px] mx-auto">
+            {/* 1. Message Button */}
+            <button 
+              onClick={() => setView('chat')}
+              className="w-12 h-12 rounded-full bg-[#1f2c34] flex items-center justify-center text-white shadow-lg active:scale-95 transition-all duration-200"
+            >
+               <i className="fa-solid fa-comment-alt text-lg"></i>
             </button>
 
-            {/* Video Toggle (Visual only) */}
-            <button className="p-3 rounded-full hover:bg-[#ffffff10] text-[#8696a0] transition-colors">
-               <Video size={28} className="fill-[#8696a0]" />
+            {/* 2. Video Toggle */}
+            <button className="w-12 h-12 rounded-full bg-[#1f2c34] flex items-center justify-center text-white shadow-lg active:scale-95 transition-all duration-200 opacity-60">
+               <i className="fa-solid fa-video text-lg"></i>
             </button>
 
-            {/* Mute Toggle */}
+            {/* 3. Mute Toggle */}
             <button 
               onClick={toggleMute}
-              className={`p-3 rounded-full transition-colors ${isMicMuted ? 'bg-white text-black' : 'hover:bg-[#ffffff10] text-white'}`}
+              className={`w-12 h-12 rounded-full flex items-center justify-center shadow-lg active:scale-95 transition-all duration-200 ${
+                isMicMuted ? 'bg-white text-[#0b141a]' : 'bg-[#1f2c34] text-white'
+              }`}
             >
-              {isMicMuted ? <i className="fa-solid fa-microphone-slash text-xl"></i> : <i className="fa-solid fa-microphone text-xl"></i>}
+              {isMicMuted ? (
+                <i className="fa-solid fa-microphone-slash text-lg"></i>
+              ) : (
+                <i className="fa-solid fa-microphone text-lg"></i>
+              )}
             </button>
 
-            {/* End Call */}
+            {/* 4. End Call - Red with Phone Down icon */}
             <button 
               onClick={handleEndCall}
-              className="p-4 bg-[#f15c6d] rounded-full text-white shadow-lg hover:opacity-90 transition-transform active:scale-95"
+              className="w-12 h-12 rounded-full bg-[#ea0038] flex items-center justify-center text-white shadow-lg active:scale-95 transition-all duration-200 hover:bg-[#ff2b2b]"
             >
-               <PhoneOff size={28} className="fill-white" />
+               {/* Rotate 135deg to make the phone icon point down (Hang up style) */}
+               <i className="fa-solid fa-phone text-lg rotate-[135deg]"></i>
             </button>
          </div>
        </div>
