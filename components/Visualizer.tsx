@@ -24,13 +24,15 @@ const Visualizer: React.FC<VisualizerProps> = ({ isActive }) => {
       ctx.clearRect(0, 0, width, height);
 
       if (!isActive) {
-        // Draw a flat line when inactive
+        // Minimal straight line when silent
         ctx.beginPath();
-        ctx.moveTo(0, height / 2);
-        ctx.lineTo(width, height / 2);
-        ctx.strokeStyle = '#475569'; // Slate 600
+        ctx.moveTo(width * 0.2, height / 2);
+        ctx.lineTo(width * 0.8, height / 2);
+        ctx.strokeStyle = '#8696a0'; // WhatsApp Gray
         ctx.lineWidth = 2;
+        ctx.globalAlpha = 0.3;
         ctx.stroke();
+        ctx.globalAlpha = 1.0;
         return;
       }
 
@@ -40,11 +42,9 @@ const Visualizer: React.FC<VisualizerProps> = ({ isActive }) => {
       
       // Create a dynamic wave
       for (let x = 0; x < width; x++) {
-        // Combine a few sine waves for an organic "voice" look
         const y = 
-          Math.sin(x * 0.02 + time) * 20 +
-          Math.sin(x * 0.05 + time * 2) * 10 +
-          Math.sin(x * 0.1 + time * 0.5) * 5;
+          Math.sin(x * 0.03 + time) * 15 +
+          Math.sin(x * 0.08 + time * 2) * 8;
         
         // Taper the ends
         const scale = Math.min(x, width - x) / (width / 2);
@@ -52,17 +52,13 @@ const Visualizer: React.FC<VisualizerProps> = ({ isActive }) => {
         ctx.lineTo(x, centerY + y * scale);
       }
 
-      // Gradient stroke
-      const gradient = ctx.createLinearGradient(0, 0, width, 0);
-      gradient.addColorStop(0, '#3b82f6'); // Blue 500
-      gradient.addColorStop(0.5, '#a855f7'); // Purple 500
-      gradient.addColorStop(1, '#ec4899'); // Pink 500
-      
-      ctx.strokeStyle = gradient;
+      // WhatsApp Call Green/Teal color
+      ctx.strokeStyle = '#00a884'; 
       ctx.lineWidth = 3;
+      ctx.lineCap = 'round';
       ctx.stroke();
 
-      time += 0.15;
+      time += 0.2;
       animationRef.current = requestAnimationFrame(render);
     };
 
@@ -74,12 +70,12 @@ const Visualizer: React.FC<VisualizerProps> = ({ isActive }) => {
   }, [isActive]);
 
   return (
-    <div className="w-full h-32 bg-slate-900/50 rounded-xl border border-slate-800 overflow-hidden backdrop-blur-sm">
+    <div className="w-full h-16 flex items-center justify-center opacity-80">
       <canvas 
         ref={canvasRef} 
-        width={600} 
-        height={128} 
-        className="w-full h-full"
+        width={300} 
+        height={64} 
+        className="w-[300px] h-[64px]"
       />
     </div>
   );
